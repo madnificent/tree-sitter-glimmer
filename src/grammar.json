@@ -35,6 +35,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "contextual_component_node"
+        },
+        {
+          "type": "SYMBOL",
           "name": "named_block_node"
         },
         {
@@ -120,7 +124,11 @@
     },
     "glimmer_tag_name": {
       "type": "PATTERN",
-      "value": "([A-Z][a-zA-Z0-9.-:]+)|([a-zA-Z][a-zA-Z0-9.]*\\.[a-zA-Z0-9.]+)"
+      "value": "[A-Z][a-zA-Z0-9-:]+"
+    },
+    "contextual_component_name": {
+      "type": "PATTERN",
+      "value": "[a-zA-Z][a-zA-Z0-9.]*\\.[a-zA-Z0-9.]+"
     },
     "named_block_name": {
       "type": "PATTERN",
@@ -265,6 +273,77 @@
         {
           "type": "SYMBOL",
           "name": "glimmer_tag_name"
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "contextual_component_start": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "contextual_component_name"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "attribute_node"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "mustache_statement"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "comment"
+                },
+                "named": true,
+                "value": "comment_statement"
+              }
+            ]
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "block_params"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "contextual_component_end": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "</"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "contextual_component_name"
         },
         {
           "type": "STRING",
@@ -427,6 +506,48 @@
         }
       ]
     },
+    "contextual_component_void": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "contextual_component_name"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "attribute_node"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "mustache_statement"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "comment"
+                },
+                "named": true,
+                "value": "comment_statement"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "/>"
+        }
+      ]
+    },
     "glimmer_node": {
       "type": "CHOICE",
       "members": [
@@ -453,6 +574,35 @@
         {
           "type": "SYMBOL",
           "name": "glimmer_node_void"
+        }
+      ]
+    },
+    "contextual_component_node": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "contextual_component_start"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_declaration"
+              }
+            },
+            {
+              "type": "SYMBOL",
+              "name": "contextual_component_end"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "contextual_component_void"
         }
       ]
     },

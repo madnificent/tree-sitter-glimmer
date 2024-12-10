@@ -14,6 +14,7 @@ module.exports = grammar({
         $.mustache_statement,
         $.block_statement,
         $.glimmer_node,
+        $.contextual_component_node,
         $.named_block_node,
         $.element_node,
         $.text_node,
@@ -47,12 +48,12 @@ module.exports = grammar({
     // HTML Elements
     //
 
-    // - Period (for contextual Glimmer components)
     // - Start with capital letter
-    // - Contains . for named block
-    // TODO: Contextual component . should be identifyable
-    // TODO: Named block should be identifyable
-    glimmer_tag_name: () => /([A-Z][a-zA-Z0-9.-:]+)|([a-zA-Z][a-zA-Z0-9.]*\.[a-zA-Z0-9.]+)/,
+    // - May contain :: (this accepts any amount of :)
+    glimmer_tag_name: () => /[A-Z][a-zA-Z0-9-:]+/,
+
+    // - If the tag contains a period it's a contextual component
+    contextual_component_name: () => /[a-zA-Z][a-zA-Z0-9.]*\.[a-zA-Z0-9.]+/,
 
     // - Start with : for named blocks
     named_block_name: () => /:[a-zA-Z0-9-]+/,
@@ -96,6 +97,23 @@ module.exports = grammar({
         ">",
       ),
     glimmer_node_end: ($) => seq("</", $.glimmer_tag_name, ">"),
+
+    // "Contextual" components with separate opening and closing tags
+    contextual_component_start: ($) =>
+      seq(
+        "<",
+        $.contextual_component_name,
+        repeat(
+          choice(
+            $.attribute_node,
+            $.mustache_statement,
+            alias($.comment, $.comment_statement),
+          ),
+        ),
+        optional($.block_params),
+        ">",
+      ),
+    contextual_component_end: ($) => seq("</", $.contextual_component_name, ">"),
 
     // "Glimmer" components with separate opening and closing tags
     named_block_node_start: ($) =>
@@ -145,12 +163,33 @@ module.exports = grammar({
         "/>",
       ),
 
+    // Glimmer self-closing components.
+    contextual_component_void: ($) =>
+      seq(
+        "<",
+        $.contextual_component_name,
+        repeat(
+          choice(
+            $.attribute_node,
+            $.mustache_statement,
+            alias($.comment, $.comment_statement),
+          ),
+        ),
+        "/>",
+      ),
+
     // there is no self-closing named block
 
     glimmer_node: ($) =>
       choice(
         seq($.glimmer_node_start, repeat($._declaration), $.glimmer_node_end),
         $.glimmer_node_void,
+      ),
+
+    contextual_component_node: ($) =>
+      choice(
+        seq($.contextual_component_start, repeat($._declaration), $.contextual_component_end),
+        $.contextual_component_void,
       ),
 
     // An "Element" is either a "normal" or "void" element
