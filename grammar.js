@@ -269,8 +269,12 @@ module.exports = grammar({
 
     block_params: ($) => seq("as", "|", repeat($.identifier), "|"),
 
-    identifier: () => /[^<>"'/={}()\s\.,!|]+/,
-    path_expression: ($) => seq($.identifier, repeat1(seq(".", $.identifier))),
+    identifier: () => /[^<>"'/={}()\s\.,!|@]+/,
+
+    path_expression: ($) => choice(
+      seq("@", $.identifier, repeat(seq(".", $.identifier))),
+      seq($.identifier, repeat1(seq(".", $.identifier)))
+    ),
 
     // Represents anything that can be a "value"; things like
     // - Strings
