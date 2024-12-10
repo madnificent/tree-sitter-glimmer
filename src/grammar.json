@@ -1,4 +1,5 @@
 {
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
   "name": "glimmer",
   "rules": {
     "template": {
@@ -27,6 +28,10 @@
         {
           "type": "SYMBOL",
           "name": "block_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "glimmer_node"
         },
         {
           "type": "SYMBOL",
@@ -109,9 +114,13 @@
         }
       ]
     },
+    "glimmer_tag_name": {
+      "type": "PATTERN",
+      "value": "([A-Z:][a-zA-Z0-9.-:]+)|([a-zA-Z][a-zA-Z0-9.]*\\.[a-zA-Z0-9.]+)"
+    },
     "tag_name": {
       "type": "PATTERN",
-      "value": "(@?[a-zA-Z0-9]|-|:|\\.)+"
+      "value": "@?[a-z0-9-][a-zA-Z0-9:-]+"
     },
     "element_node_start": {
       "type": "SEQ",
@@ -184,6 +193,77 @@
         }
       ]
     },
+    "glimmer_node_start": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "glimmer_tag_name"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "attribute_node"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "mustache_statement"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "comment"
+                },
+                "named": true,
+                "value": "comment_statement"
+              }
+            ]
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "block_params"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "glimmer_node_end": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "</"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "glimmer_tag_name"
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
     "element_node_void": {
       "type": "SEQ",
       "members": [
@@ -223,6 +303,77 @@
         {
           "type": "STRING",
           "value": "/>"
+        }
+      ]
+    },
+    "glimmer_node_void": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "glimmer_tag_name"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "attribute_node"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "mustache_statement"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "comment"
+                },
+                "named": true,
+                "value": "comment_statement"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "/>"
+        }
+      ]
+    },
+    "glimmer_node": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "glimmer_node_start"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_declaration"
+              }
+            },
+            {
+              "type": "SYMBOL",
+              "name": "glimmer_node_end"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "glimmer_node_void"
         }
       ]
     },

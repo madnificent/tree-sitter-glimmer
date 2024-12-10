@@ -13,6 +13,7 @@ module.exports = grammar({
         alias($.comment, $.comment_statement),
         $.mustache_statement,
         $.block_statement,
+        $.glimmer_node,
         $.element_node,
         $.text_node,
       ),
@@ -45,12 +46,19 @@ module.exports = grammar({
     // HTML Elements
     //
 
+    // - Period (for contextual Glimmer components)
+    // - Start with capital letter
+    // - Start with : for named blocks
+    // - Contains . for named block
+    // TODO: Contextual component . should be identifyable
+    // TODO: Named block should be identifyable
+    glimmer_tag_name: () => /([A-Z:][a-zA-Z0-9.-:]+)|([a-zA-Z][a-zA-Z0-9.]*\.[a-zA-Z0-9.]+)/,
+
     // Match a sequence of letters, plus
     // - @ (for arguments, so they can only appear first)
     // - Hyphens (for web components)
-    // - Period (for contextual Glimmer components)
     // - Colon (for component namespacing and named blocks)
-    tag_name: () => /(@?[a-zA-Z0-9]|-|:|\.)+/,
+    tag_name: () => /@?[a-z0-9-][a-zA-Z0-9:-]+/,
 
     // "Normal" elements with separate opening and closing tags
     element_node_start: ($) =>
@@ -69,6 +77,24 @@ module.exports = grammar({
       ),
     element_node_end: ($) => seq("</", $.tag_name, ">"),
 
+    // "Glimmer" components with separate opening and closing tags
+    glimmer_node_start: ($) =>
+      seq(
+        "<",
+        $.glimmer_tag_name,
+        repeat(
+          choice(
+            $.attribute_node,
+            $.mustache_statement,
+            alias($.comment, $.comment_statement),
+          ),
+        ),
+        optional($.block_params),
+        ">",
+      ),
+    glimmer_node_end: ($) => seq("</", $.glimmer_tag_name, ">"),
+
+
     // "Void" elements are self-closing
     element_node_void: ($) =>
       seq(
@@ -82,6 +108,27 @@ module.exports = grammar({
           ),
         ),
         "/>",
+      ),
+
+    // Glimmer self-closing components.
+    glimmer_node_void: ($) =>
+      seq(
+        "<",
+        $.glimmer_tag_name,
+        repeat(
+          choice(
+            $.attribute_node,
+            $.mustache_statement,
+            alias($.comment, $.comment_statement),
+          ),
+        ),
+        "/>",
+      ),
+
+    glimmer_node: ($) =>
+      choice(
+        seq($.glimmer_node_start, repeat($._declaration), $.glimmer_node_end),
+        $.glimmer_node_void,
       ),
 
     // An "Element" is either a "normal" or "void" element
