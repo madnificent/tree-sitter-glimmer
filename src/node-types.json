@@ -75,6 +75,10 @@
             "named": true
           },
           {
+            "type": "named_block_node",
+            "named": true
+          },
+          {
             "type": "text_node",
             "named": true
           }
@@ -233,6 +237,10 @@
           "named": true
         },
         {
+          "type": "named_block_node",
+          "named": true
+        },
+        {
           "type": "text_node",
           "named": true
         }
@@ -350,6 +358,10 @@
         },
         {
           "type": "mustache_statement",
+          "named": true
+        },
+        {
+          "type": "named_block_node",
           "named": true
         },
         {
@@ -578,6 +590,99 @@
     }
   },
   {
+    "type": "named_block_node",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "block_statement",
+          "named": true
+        },
+        {
+          "type": "comment_statement",
+          "named": true
+        },
+        {
+          "type": "element_node",
+          "named": true
+        },
+        {
+          "type": "glimmer_node",
+          "named": true
+        },
+        {
+          "type": "mustache_statement",
+          "named": true
+        },
+        {
+          "type": "named_block_node",
+          "named": true
+        },
+        {
+          "type": "named_block_node_end",
+          "named": true
+        },
+        {
+          "type": "named_block_node_start",
+          "named": true
+        },
+        {
+          "type": "text_node",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "named_block_node_end",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "named_block_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "named_block_node_start",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute_node",
+          "named": true
+        },
+        {
+          "type": "block_params",
+          "named": true
+        },
+        {
+          "type": "comment_statement",
+          "named": true
+        },
+        {
+          "type": "mustache_statement",
+          "named": true
+        },
+        {
+          "type": "named_block_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "path_expression",
     "named": true,
     "fields": {},
@@ -666,6 +771,10 @@
           "named": true
         },
         {
+          "type": "named_block_node",
+          "named": true
+        },
+        {
           "type": "text_node",
           "named": true
         }
@@ -734,6 +843,10 @@
   },
   {
     "type": "identifier",
+    "named": true
+  },
+  {
+    "type": "named_block_name",
     "named": true
   },
   {

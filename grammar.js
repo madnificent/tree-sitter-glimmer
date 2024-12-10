@@ -14,6 +14,7 @@ module.exports = grammar({
         $.mustache_statement,
         $.block_statement,
         $.glimmer_node,
+        $.named_block_node,
         $.element_node,
         $.text_node,
       ),
@@ -48,11 +49,13 @@ module.exports = grammar({
 
     // - Period (for contextual Glimmer components)
     // - Start with capital letter
-    // - Start with : for named blocks
     // - Contains . for named block
     // TODO: Contextual component . should be identifyable
     // TODO: Named block should be identifyable
-    glimmer_tag_name: () => /([A-Z:][a-zA-Z0-9.-:]+)|([a-zA-Z][a-zA-Z0-9.]*\.[a-zA-Z0-9.]+)/,
+    glimmer_tag_name: () => /([A-Z][a-zA-Z0-9.-:]+)|([a-zA-Z][a-zA-Z0-9.]*\.[a-zA-Z0-9.]+)/,
+
+    // - Start with : for named blocks
+    named_block_name: () => /:[a-zA-Z0-9-]+/,
 
     // Match a sequence of letters, plus
     // - @ (for arguments, so they can only appear first)
@@ -94,6 +97,23 @@ module.exports = grammar({
       ),
     glimmer_node_end: ($) => seq("</", $.glimmer_tag_name, ">"),
 
+    // "Glimmer" components with separate opening and closing tags
+    named_block_node_start: ($) =>
+      seq(
+        "<",
+        $.named_block_name,
+        repeat(
+          choice(
+            $.attribute_node,
+            $.mustache_statement,
+            alias($.comment, $.comment_statement),
+          ),
+        ),
+        optional($.block_params),
+        ">",
+      ),
+    named_block_node_end: ($) => seq("</", $.named_block_name, ">"),
+
 
     // "Void" elements are self-closing
     element_node_void: ($) =>
@@ -125,6 +145,8 @@ module.exports = grammar({
         "/>",
       ),
 
+    // there is no self-closing named block
+
     glimmer_node: ($) =>
       choice(
         seq($.glimmer_node_start, repeat($._declaration), $.glimmer_node_end),
@@ -137,6 +159,10 @@ module.exports = grammar({
         seq($.element_node_start, repeat($._declaration), $.element_node_end),
         $.element_node_void,
       ),
+
+    // An "Element" is either a "normal" or "void" element
+    named_block_node: ($) =>
+      seq($.named_block_node_start, repeat($._declaration), $.named_block_node_end),
 
     attribute_name: () => /[^<>"'/={}()\s\.,!?|]+/,
 
